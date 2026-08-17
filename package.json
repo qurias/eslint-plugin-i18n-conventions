@@ -1,0 +1,51 @@
+{
+  "name": "eslint-plugin-i18n-conventions",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qurias/eslint-plugin-i18n-conventions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qurias/eslint-plugin-i18n-conventions/issues"
+  },
+  "homepage": "https://github.com/qurias/eslint-plugin-i18n-conventions#readme",
+  "description": "ESLint plugin for enforcing i18n conventions in JavaScript, TypeScript, and Vue projects",
+  "main": "index.js",
+  "type": "commonjs",
+  "files": [
+    "index.js",
+    "rules",
+    "utils"
+  ],
+  "scripts": {
+    "test": "node tests/no-raw-text.test.js"
+  },
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "i18n",
+    "localization",
+    "internationalization",
+    "vue",
+    "vue3",
+    "javascript",
+    "typescript",
+    "raw-text",
+    "locale",
+    "locales",
+    "translation",
+    "i18n-conventions"
+  ],
+  "peerDependencies": {
+    "eslint": "^8.0.0",
+    "vue-eslint-parser": "^8.0.0 || ^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "vue-eslint-parser": "^9.4.3"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT"
+}
