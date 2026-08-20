@@ -5,7 +5,7 @@ ESLint plugin for enforcing project-specific i18n conventions in JavaScript, Typ
 The plugin detects user-facing text that is written directly in source code instead of using i18n. It can be configured to match the conventions and architecture of an existing project.
 
 ## Features
-п
+
 - Detects raw user-facing text in JavaScript and TypeScript
 - Detects raw text in Vue 3 templates
 - Detects raw text in `<script>` and `<script setup>` blocks inside `.vue` files
