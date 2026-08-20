@@ -12,22 +12,17 @@ const {
 const { isTranslatable } = require('../utils/is-translatable')
 
 /**
- * Locale names supported by translation files.
+ * Locale names.
  *
  * Examples:
- *  en
- *  ru
- *  de
- *  am
- *  am-is
- *  en-US
- *  en-us
- *  pt-BR
- *  pt-br
- *  zh-CN
- *  zh-cn
- *  zh-Hans
- *  zh-hant
+ * en
+ * ru
+ * de
+ * en-US
+ * en-GB
+ * pt-BR
+ * zh-CN
+ * am-is
  */
 const LOCALE_PATTERN = /^[a-z]{2,3}(?:-[a-z]{2,4})?$/i
 
@@ -39,6 +34,12 @@ const LOCALE_PATTERN = /^[a-z]{2,3}(?:-[a-z]{2,4})?$/i
  * defaults
  * + add
  * - remove
+ *
+ * Backward compatibility:
+ *
+ * functions: ['foo', 'bar']
+ *
+ * completely replaces defaults.
  */
 function mergeOptionValues(defaults, config) {
   if (Array.isArray(config)) {
@@ -104,8 +105,7 @@ function getVariableName(node) {
 }
 
 /**
- * Checks whether the property key
- * represents a locale.
+ * Checks whether the property key represents a locale.
  *
  * 'en'
  * 'ru'
@@ -144,30 +144,16 @@ function isLocaleKey(node) {
  * export default {
  *   'en': {
  *     title: 'Delete user'
- *   },
- *
- *   'ru': {
- *     title: 'Удалить пользователя'
  *   }
  * }
  *
- * The strings inside "en" and "ru" are translation values
+ * The strings inside "en" are translation values
  * and should not be reported as raw text.
  */
 function isInsideTranslationLocale(node) {
   let current = node.parent
 
   while (current) {
-    /**
-     * We are looking for:
-     *
-     * 'en': {
-     *   ...
-     * }
-     *
-     * where the locale property belongs directly
-     * to the exported object.
-     */
     if (
       current.type === 'Property' &&
       current.parent &&
@@ -266,6 +252,24 @@ function isI18nArgument(node, options) {
 }
 
 /**
+ * Checks whether the call uses a configured user-facing function.
+ *
+ * toast('...')
+ * notify('...')
+ */
+function isConfiguredFunctionCall(node, options) {
+  if (!node || node.type !== 'CallExpression') {
+    return false
+  }
+
+  if (node.callee.type !== 'Identifier') {
+    return false
+  }
+
+  return options.functions.includes(node.callee.name)
+}
+
+/**
  * Checks functions:
  *
  * toast('...')
@@ -279,13 +283,7 @@ function isFunctionArgument(node, options) {
     return false
   }
 
-  const callee = parent.callee
-
-  if (callee.type !== 'Identifier') {
-    return false
-  }
-
-  return options.functions.includes(callee.name)
+  return isConfiguredFunctionCall(parent, options)
 }
 
 /**
@@ -321,6 +319,19 @@ function isVariableValue(node, options) {
   }
 
   return isTextVariable(parent, options)
+}
+
+/**
+ * Checks whether a literal is a direct Vue interpolation expression.
+ *
+ * {{ 'Hello' }}
+ */
+function isDirectVueExpression(node) {
+  const parent = node.parent
+
+  return Boolean(
+    parent && parent.type === 'VExpressionContainer',
+  )
 }
 
 /**
@@ -370,6 +381,7 @@ module.exports = {
                   type: 'string',
                 },
               },
+
               {
                 type: 'object',
 
@@ -413,6 +425,7 @@ module.exports = {
                   type: 'string',
                 },
               },
+
               {
                 type: 'object',
 
@@ -456,6 +469,7 @@ module.exports = {
                   type: 'string',
                 },
               },
+
               {
                 type: 'object',
 
@@ -499,6 +513,7 @@ module.exports = {
                   type: 'string',
                 },
               },
+
               {
                 type: 'object',
 
@@ -594,9 +609,6 @@ module.exports = {
      * ========================================================
      */
     const scriptVisitor = {
-      /**
-       * Regular string literals.
-       */
       Literal(node) {
         if (typeof node.value !== 'string') {
           return
@@ -616,8 +628,6 @@ module.exports = {
          *     title: 'Delete user'
          *   }
          * }
-         *
-         * These strings are already translation values.
          */
         if (isInsideTranslationLocale(node)) {
           return
@@ -706,6 +716,50 @@ module.exports = {
 
         if (options.properties.includes(name)) {
           report(context, node.value, text)
+        }
+      },
+
+      /**
+       * Vue expressions.
+       *
+       * {{ 'qwe' }}
+       * {{ toast('qwe') }}
+       * {{ t('page.title') }}
+       */
+      Literal(node) {
+        if (typeof node.value !== 'string') {
+          return
+        }
+
+        const text = node.value
+
+        if (!isTranslatable(text, options)) {
+          return
+        }
+
+        /**
+         * {{ t('page.title') }}
+         * {{ i18n.t('page.title') }}
+         */
+        if (isI18nArgument(node, options)) {
+          return
+        }
+
+        /**
+         * {{ toast('qwe') }}
+         * {{ notify('Something went wrong') }}
+         */
+        if (isFunctionArgument(node, options)) {
+          report(context, node, text)
+
+          return
+        }
+
+        /**
+         * {{ 'qwe' }}
+         */
+        if (isDirectVueExpression(node)) {
+          report(context, node, text)
         }
       },
     }

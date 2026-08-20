@@ -316,8 +316,7 @@ jsRuleTester.run('no-raw-text', rule, {
     },
 
     /**
-     * Ordinary object with locale-like key.
-     * It must still be checked.
+     * Ordinary object with locale-like key
      */
     {
       code: `
@@ -340,8 +339,7 @@ jsRuleTester.run('no-raw-text', rule, {
     },
 
     /**
-     * Deep ordinary object.
-     * It must still be checked.
+     * Deep ordinary object
      */
     {
       code: `
@@ -479,6 +477,32 @@ vueRuleTester.run('no-raw-text/vue', rule, {
     },
 
     /**
+     * Direct i18n function in interpolation
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ t('page.title') }}</div>
+        </template>
+      `,
+    },
+
+    /**
+     * i18n object in interpolation
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ i18n.t('page.title') }}</div>
+        </template>
+      `,
+    },
+
+    /**
      * Symbols
      */
     {
@@ -497,6 +521,45 @@ vueRuleTester.run('no-raw-text/vue', rule, {
       code: `
         <template>
           <div>→</div>
+        </template>
+      `,
+    },
+
+    /**
+     * Direct numeric interpolation
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ '123' }}</div>
+        </template>
+      `,
+    },
+
+    /**
+     * Technical value inside configured function
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ toast('123') }}</div>
+        </template>
+      `,
+    },
+
+    /**
+     * i18n call inside configured function
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ toast(t('page.title')) }}</div>
         </template>
       `,
     },
@@ -603,6 +666,85 @@ vueRuleTester.run('no-raw-text/vue', rule, {
 
           data: {
             text: 'Delete user',
+          },
+        },
+      ],
+    },
+
+    /**
+     * Raw text directly inside interpolation
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ 'qwe' }}</div>
+        </template>
+      `,
+
+      errors: [
+        {
+          messageId: 'rawText',
+
+          data: {
+            text: 'qwe',
+          },
+        },
+      ],
+    },
+
+    /**
+     * Raw text inside configured function
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>{{ toast('qwe') }}</div>
+        </template>
+      `,
+
+      errors: [
+        {
+          messageId: 'rawText',
+
+          data: {
+            text: 'qwe',
+          },
+        },
+      ],
+    },
+
+    /**
+     * Custom configured function inside interpolation
+     */
+    {
+      filename: 'test.vue',
+
+      code: `
+        <template>
+          <div>
+            {{ showNotification('Something went wrong') }}
+          </div>
+        </template>
+      `,
+
+      options: [
+        {
+          functions: {
+            add: ['showNotification'],
+          },
+        },
+      ],
+
+      errors: [
+        {
+          messageId: 'rawText',
+
+          data: {
+            text: 'Something went wrong',
           },
         },
       ],
