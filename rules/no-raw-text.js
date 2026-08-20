@@ -32,6 +32,34 @@ const { isTranslatable } = require('../utils/is-translatable')
 const LOCALE_PATTERN = /^[a-z]{2,3}(?:-[a-z]{2,4})?$/i
 
 /**
+ * Merges default values with user additions/removals.
+ *
+ * Result:
+ *
+ * defaults
+ * + add
+ * - remove
+ */
+function mergeOptionValues(defaults, config) {
+  if (Array.isArray(config)) {
+    return config
+  }
+
+  const add = Array.isArray(config?.add) ? config.add : []
+
+  const remove = new Set(
+    Array.isArray(config?.remove) ? config.remove : [],
+  )
+
+  return [
+    ...new Set([
+      ...defaults.filter((item) => !remove.has(item)),
+      ...add,
+    ]),
+  ]
+}
+
+/**
  * Gets the object property name.
  *
  * {
@@ -328,54 +356,173 @@ module.exports = {
           /**
            * Functions:
            *
-           * toast('...')
-           * notify('...')
+           * functions: {
+           *   add: ['showNotification'],
+           *   remove: ['alert']
+           * }
            */
           functions: {
-            type: 'array',
+            anyOf: [
+              {
+                type: 'array',
 
-            items: {
-              type: 'string',
-            },
+                items: {
+                  type: 'string',
+                },
+              },
+              {
+                type: 'object',
+
+                properties: {
+                  add: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+
+                  remove: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+
+                additionalProperties: false,
+              },
+            ],
           },
 
           /**
            * Properties:
            *
-           * title: '...'
-           * message: '...'
+           * properties: {
+           *   add: ['tooltip'],
+           *   remove: ['description']
+           * }
            */
           properties: {
-            type: 'array',
+            anyOf: [
+              {
+                type: 'array',
 
-            items: {
-              type: 'string',
-            },
+                items: {
+                  type: 'string',
+                },
+              },
+              {
+                type: 'object',
+
+                properties: {
+                  add: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+
+                  remove: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+
+                additionalProperties: false,
+              },
+            ],
           },
 
           /**
            * Variables:
            *
-           * const title = '...'
-           * const message = '...'
+           * variables: {
+           *   add: ['heading'],
+           *   remove: ['status']
+           * }
            */
           variables: {
-            type: 'array',
+            anyOf: [
+              {
+                type: 'array',
 
-            items: {
-              type: 'string',
-            },
+                items: {
+                  type: 'string',
+                },
+              },
+              {
+                type: 'object',
+
+                properties: {
+                  add: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+
+                  remove: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+
+                additionalProperties: false,
+              },
+            ],
           },
 
           /**
-           * Ignored values.
+           * Ignored values:
+           *
+           * ignoredValues: {
+           *   add: ['MY_CONSTANT'],
+           *   remove: ['123']
+           * }
            */
           ignoredValues: {
-            type: 'array',
+            anyOf: [
+              {
+                type: 'array',
 
-            items: {
-              type: 'string',
-            },
+                items: {
+                  type: 'string',
+                },
+              },
+              {
+                type: 'object',
+
+                properties: {
+                  add: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+
+                  remove: {
+                    type: 'array',
+
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+
+                additionalProperties: false,
+              },
+            ],
           },
 
           /**
@@ -414,14 +561,25 @@ module.exports = {
     const userOptions = context.options[0] || {}
 
     const options = {
-      functions: userOptions.functions || DEFAULT_FUNCTIONS,
+      functions: mergeOptionValues(
+        DEFAULT_FUNCTIONS,
+        userOptions.functions,
+      ),
 
-      properties: userOptions.properties || DEFAULT_PROPERTIES,
+      properties: mergeOptionValues(
+        DEFAULT_PROPERTIES,
+        userOptions.properties,
+      ),
 
-      variables: userOptions.variables || DEFAULT_VARIABLES,
+      variables: mergeOptionValues(
+        DEFAULT_VARIABLES,
+        userOptions.variables,
+      ),
 
-      ignoredValues:
-        userOptions.ignoredValues || DEFAULT_IGNORED_VALUES,
+      ignoredValues: mergeOptionValues(
+        DEFAULT_IGNORED_VALUES,
+        userOptions.ignoredValues,
+      ),
 
       i18nFunctions:
         userOptions.i18nFunctions || DEFAULT_I18N_FUNCTIONS,
