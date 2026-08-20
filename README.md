@@ -1,44 +1,39 @@
 # eslint-plugin-i18n-conventions
 
-ESLint plugin for detecting raw user-facing text that should use i18n.
+ESLint plugin for enforcing project-specific i18n conventions in JavaScript, TypeScript, and Vue 3 projects.
 
-The plugin helps enforce i18n conventions in JavaScript, TypeScript, and
-Vue 3 projects by detecting user-facing text that is written directly in
-source code instead of being handled through an i18n solution.
+The plugin detects user-facing text that is written directly in source code instead of using i18n. It can be configured to match the conventions and architecture of an existing project.
 
 ## Features
-
--   Detects raw user-facing text in JavaScript and TypeScript
--   Detects raw text in Vue 3 templates
--   Detects raw text in `<script>` and `<script setup>` blocks inside
-    `.vue` files
--   Supports custom functions such as `toast()`, `notify()`, and
-    `alert()`
--   Supports custom text properties such as `title`, `message`, `label`,
-    and `placeholder`
--   Supports custom variable names
--   Supports i18n functions such as `t()` and `$t()`
--   Supports i18n objects such as `i18n.t()`
--   Ignores empty strings, technical values, symbols, and numbers
--   Supports translation files with locale objects such as `en`, `ru`,
-    `en-US`, `pt-BR`, and `am-is`
--   Supports deeply nested translation objects
--   Provides a recommended ESLint configuration
+п
+- Detects raw user-facing text in JavaScript and TypeScript
+- Detects raw text in Vue 3 templates
+- Detects raw text in `<script>` and `<script setup>` blocks inside `.vue` files
+- Supports custom functions such as `toast()`, `notify()`, and `alert()`
+- Supports custom text properties such as `title`, `message`, `label`, and `placeholder`
+- Supports custom variable names
+- Supports custom i18n functions such as `t()` and `$t()`
+- Supports custom i18n objects such as `i18n.t()`
+- Allows adding and removing default functions, properties, variables, and ignored values
+- Ignores empty strings, technical values, symbols, and numbers
+- Supports translation files with locale objects such as `en`, `ru`, `en-US`, `pt-BR`, and `am-is`
+- Supports deeply nested translation objects
+- Provides a recommended ESLint configuration
 
 ## Supported
 
--   JavaScript
--   TypeScript
--   Vue 3
--   `.vue` templates
--   `<script>` and `<script setup>` inside `.vue`
--   ESLint 8
+- JavaScript
+- TypeScript
+- Vue 3
+- `.vue` templates
+- `<script>` and `<script setup>` inside `.vue`
+- ESLint 8
 
 ## Installation
 
 Install the plugin as a development dependency:
 
-``` bash
+```bash
 npm install -D eslint-plugin-i18n-conventions
 ```
 
@@ -48,7 +43,7 @@ npm install -D eslint-plugin-i18n-conventions
 
 For a classic ESLint configuration:
 
-``` js
+```js
 module.exports = {
   extends: [
     'plugin:i18n-conventions/recommended',
@@ -58,7 +53,7 @@ module.exports = {
 
 The recommended configuration enables:
 
-``` text
+```text
 i18n-conventions/no-raw-text
 ```
 
@@ -68,7 +63,7 @@ with `error` severity.
 
 You can also configure the rule manually:
 
-``` js
+```js
 module.exports = {
   plugins: [
     'i18n-conventions',
@@ -82,38 +77,37 @@ module.exports = {
 
 ## Rule: `no-raw-text`
 
-The `no-raw-text` rule detects user-facing text that is written directly
-in source code and should be handled through i18n.
+The `no-raw-text` rule detects user-facing text that is written directly in source code and should be handled through i18n.
 
 ### Invalid
 
-``` js
+```js
 const title = 'Delete user'
 ```
 
-``` js
+```js
 const message = 'Something went wrong'
 ```
 
-``` js
+```js
 const label = 'Name'
 ```
 
-``` js
+```js
 const placeholder = 'Enter your name'
 ```
 
-``` js
+```js
 const config = {
   title: 'Delete user',
 }
 ```
 
-``` js
+```js
 toast('Delete user')
 ```
 
-``` js
+```js
 notify('Something went wrong')
 ```
 
@@ -121,41 +115,41 @@ notify('Something went wrong')
 
 Text passed through an i18n function is ignored:
 
-``` js
+```js
 const title = t('user.delete')
 ```
 
-``` js
+```js
 const title = $t('user.delete')
 ```
 
-``` js
+```js
 const title = i18n.t('user.delete')
 ```
 
 Technical values and values without letters are ignored:
 
-``` js
+```js
 const value = '123'
 ```
 
-``` js
+```js
 const value = '100%'
 ```
 
-``` js
+```js
 const value = '№'
 ```
 
-``` js
+```js
 const value = '---'
 ```
 
-``` js
+```js
 const value = '...'
 ```
 
-``` js
+```js
 const value = '→'
 ```
 
@@ -165,13 +159,13 @@ The rule checks text directly written in Vue templates.
 
 ### Invalid
 
-``` vue
+```vue
 <template>
   <button>Delete user</button>
 </template>
 ```
 
-``` vue
+```vue
 <template>
   <span>Something went wrong</span>
 </template>
@@ -179,7 +173,7 @@ The rule checks text directly written in Vue templates.
 
 It also checks configured attributes:
 
-``` vue
+```vue
 <template>
   <input placeholder="Enter your name">
 </template>
@@ -187,13 +181,13 @@ It also checks configured attributes:
 
 ### Valid
 
-``` vue
+```vue
 <template>
   <button>{{ $t('user.delete') }}</button>
 </template>
 ```
 
-``` vue
+```vue
 <template>
   <input :placeholder="$t('user.enterName')">
 </template>
@@ -205,7 +199,7 @@ The rule also checks `<script>` and `<script setup>` blocks.
 
 ### Invalid
 
-``` vue
+```vue
 <script setup>
 const title = 'Delete user'
 </script>
@@ -213,7 +207,7 @@ const title = 'Delete user'
 
 ### Valid
 
-``` vue
+```vue
 <script setup>
 const title = t('user.delete')
 </script>
@@ -225,7 +219,7 @@ Translation values inside locale objects are not considered raw text.
 
 For example:
 
-``` js
+```js
 export default {
   en: {
     auth: {
@@ -243,12 +237,11 @@ export default {
 }
 ```
 
-The translation values are ignored because they belong to locale
-objects.
+The translation values are ignored because they belong to locale objects.
 
 Deeply nested translation objects are also supported:
 
-``` js
+```js
 export default {
   en: {
     pages: {
@@ -269,7 +262,7 @@ export default {
 
 Locale names with language and region variants are supported:
 
-``` js
+```js
 export default {
   en: {},
   ru: {},
@@ -285,34 +278,33 @@ export default {
 
 The rule supports configuration for project-specific i18n conventions.
 
-``` js
+Default functions, properties, variables, and ignored values can be extended or removed using `add` and `remove`.
+
+```js
 module.exports = {
   rules: {
     'i18n-conventions/no-raw-text': [
       'error',
       {
-        functions: [
-          'toast',
-          'notify',
-          'alert',
-        ],
+        functions: {
+          add: ['showNotification'],
+          remove: ['alert'],
+        },
 
-        properties: [
-          'title',
-          'message',
-          'label',
-          'placeholder',
-        ],
+        properties: {
+          add: ['tooltip'],
+          remove: ['description'],
+        },
 
-        variables: [
-          'title',
-          'message',
-          'label',
-        ],
+        variables: {
+          add: ['heading'],
+          remove: ['status'],
+        },
 
-        ignoredValues: [
-          'some-technical-value',
-        ],
+        ignoredValues: {
+          add: ['MY_TECHNICAL_VALUE'],
+          remove: ['123'],
+        },
 
         i18nFunctions: [
           't',
@@ -330,75 +322,147 @@ module.exports = {
 
 ### `functions`
 
-Functions whose string arguments should be considered user-facing text.
+Defines functions whose string arguments should be considered user-facing text.
+
+Default values are preserved unless explicitly removed.
+
+```js
+functions: {
+  add: ['showNotification'],
+  remove: ['alert'],
+}
+```
+
+This means:
+
+- `showNotification()` is added to the default list;
+- `alert()` is removed from the default list.
 
 For example:
 
-``` js
-toast('Delete user')
+```js
+showNotification('Something went wrong')
 ```
+
+will be reported.
 
 ### `properties`
 
-Object properties whose values should be considered user-facing text.
+Defines object properties whose values should be considered user-facing text.
+
+```js
+properties: {
+  add: ['tooltip'],
+  remove: ['description'],
+}
+```
 
 For example:
 
-``` js
+```js
 const config = {
-  title: 'Delete user',
+  tooltip: 'Delete user',
 }
 ```
 
 ### `variables`
 
-Variable names whose values should be considered user-facing text.
+Defines variable names whose values should be considered user-facing text.
+
+```js
+variables: {
+  add: ['heading'],
+  remove: ['status'],
+}
+```
 
 For example:
 
-``` js
-const title = 'Delete user'
+```js
+const heading = 'Delete user'
 ```
 
 ### `ignoredValues`
 
-Values that should not be reported by the rule.
+Defines values that should not be reported by the rule.
+
+```js
+ignoredValues: {
+  add: ['MY_TECHNICAL_VALUE'],
+  remove: ['123'],
+}
+```
 
 This option can be used for project-specific technical values.
 
 ### `i18nFunctions`
 
-Functions that represent i18n calls.
+Defines functions that represent i18n calls.
+
+```js
+i18nFunctions: [
+  't',
+  '$t',
+]
+```
 
 For example:
 
-``` js
+```js
 t('user.delete')
 $t('user.delete')
 ```
 
 ### `i18nObjects`
 
-Objects that represent i18n instances.
+Defines objects that represent i18n instances.
+
+```js
+i18nObjects: [
+  'i18n',
+]
+```
 
 For example:
 
-``` js
+```js
 i18n.t('user.delete')
 i18n.$t('user.delete')
 ```
+
+## Backward compatibility
+
+For `functions`, `properties`, `variables`, and `ignoredValues`, an array can also be provided instead of an `add`/`remove` object.
+
+```js
+module.exports = {
+  rules: {
+    'i18n-conventions/no-raw-text': [
+      'error',
+      {
+        functions: [
+          'toast',
+          'notify',
+        ],
+      },
+    ],
+  },
+}
+```
+
+When an array is provided, it completely replaces the corresponding default values.
 
 ## Ignored values
 
 The rule automatically ignores:
 
--   empty strings
--   configured technical values
--   strings that contain no letters
+- empty strings;
+- configured technical values;
+- strings that contain no letters.
 
 For example:
 
-``` js
+```js
 '123'
 '100%'
 '№'
@@ -412,7 +476,7 @@ For example:
 
 However, a value containing letters is still considered text:
 
-``` js
+```js
 'Error №'
 '№ document'
 '100% complete'
@@ -423,17 +487,20 @@ However, a value containing letters is still considered text:
 
 A typical project configuration can use:
 
-``` json
+If the project uses `.eslintignore` instead of `.gitignore`, use the corresponding ESLint configuration for that setup.
+
+```json
 {
   "scripts": {
-    "lint": "eslint . --ext .vue,.js,.ts --ignore-path (.gitignore or .eslintignore)",
+    "lint": "eslint . --ext .vue,.js,.ts --ignore-path .gitignore",
+    "lint:fix": "eslint . --ext .vue,.js,.ts --fix --ignore-path .gitignore"
   }
 }
 ```
 
 Run the check with:
 
-``` bash
+```bash
 npm run lint
 ```
 
@@ -441,7 +508,7 @@ npm run lint
 
 Given:
 
-``` js
+```js
 const title = 'Delete user'
 
 const message = t('user.delete')
@@ -451,40 +518,41 @@ const value = '123'
 
 ESLint reports:
 
-``` text
+```text
 Raw text "Delete user" should use i18n.
 ```
 
 The following values are ignored:
 
-``` js
+```js
 const message = t('user.delete')
 const value = '123'
 ```
 
 ## Why use this plugin?
 
-The plugin is intended for projects where i18n usage follows specific
-project conventions.
+The plugin is designed for projects with their own i18n conventions.
 
-Instead of treating every string literal as user-facing text, the rule
-focuses on locations that are expected to contain user-facing text:
+Instead of treating every string literal as user-facing text, the rule analyzes the context in which a string is used.
 
--   text variables
--   text properties
--   notification functions
--   Vue template text
--   Vue attributes
--   project-specific i18n functions and objects
+It can detect user-facing text in:
 
-This makes it possible to adapt the rule to the conventions of an
-existing project.
+- text variables;
+- object properties;
+- notification and UI functions;
+- Vue template text;
+- Vue attributes;
+- project-specific i18n functions and objects.
+
+The rule can also be adapted to an existing codebase by adding or removing default functions, properties, variables, and ignored values.
+
+This helps detect real localization issues while reducing false positives from technical values, identifiers, numbers, and symbols.
 
 ## Requirements
 
--   Node.js
--   ESLint 8
--   Vue 3 for Vue template support
+- Node.js
+- ESLint 8
+- Vue 3 for Vue template support
 
 ## License
 
